@@ -1,0 +1,20 @@
+/gestion-recursos
+  /frontend
+    index.html
+    (otros archivos estáticos)
+  /backend
+    /src
+      /controllers
+        resource.controller.ts
+        auth.controller.ts
+      /models
+        resource.model.ts
+        user.model.ts
+      /routes
+        resource.routes.ts
+        auth.routes.ts
+      app.ts
+    Dockerfile
+    package.json
+    tsconfig.json
+  docker-compose.yml

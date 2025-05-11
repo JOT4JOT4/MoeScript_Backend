@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Recursos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #35424a;
+            color: white;
+            padding: 20px 0;
+            border-bottom: #e8491d 3px solid;
+        }
+        header h1 {
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            width: 300px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background: #35424a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .main-content {
+            display: none; /* Inicialmente oculto hasta el login */
+            margin-top: 20px;
+        }
+        .resource-nav {
+            background: #35424a;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .resource-nav button {
+            margin-right: 10px;
+            padding: 5px 10px;
+            background: #e8491d;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .resource-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .resource-table th, .resource-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .resource-table th {
+            background-color: #35424a;
+            color: white;
+        }
+        .resource-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Gestión de Recursos</h1>
+        </div>
+    </header>
+
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Usuario" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+
+    <!-- Contenido Principal (oculto inicialmente) -->
+    <div id="main-content" class="container main-content">
+        <div class="resource-nav">
+            <button id="btn-maquinaria">Maquinaria</button>
+            <button id="btn-personal">Personal</button>
+            <button id="btn-productos">Productos</button>
+            <button id="btn-informes">Informes</button>
+            <button id="btn-logout" style="float: right;">Cerrar Sesión</button>
+        </div>
+
+        <div id="resource-content">
+            <h2 id="resource-title">Seleccione un tipo de recurso</h2>
+            <div id="resource-list">
+                <!-- Aquí se cargará dinámicamente la lista de recursos -->
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Última Modificación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resource-items">
+                        <!-- Los recursos se cargarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="resource-detail" style="display: none;">
+            <h2 id="detail-title">Detalle del Recurso</h2>
+            <button id="btn-back">Volver a la lista</button>
+            <div id="detail-content">
+                <!-- Aquí se cargarán los detalles del recurso seleccionado -->
+                <div id="basic-info"></div>
+                <div id="components-section">
+                    <h3>Componentes</h3>
+                    <ul id="components-list"></ul>
+                </div>
+                <div id="history-section">
+                    <h3>Historial de Modificaciones</h3>
+                    <table class="resource-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Cambio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-items"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports-section" style="display: none;">
+            <h2>Informes</h2>
+            <div>
+                <label for="report-type">Tipo de informe:</label>
+                <select id="report-type">
+                    <option value="modifications">Últimas modificaciones</option>
+                    <option value="inventory">Inventario</option>
+                    <option value="status">Estado de recursos</option>
+                </select>
+                <button id="btn-generate-report">Generar Informe</button>
+            </div>
+            <div id="report-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Aquí iría la validación real con el backend
+            if(username && password) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        });
+
+        // Simulación de logout
+        document.getElementById('btn-logout').addEventListener('click', function() {
+            document.getElementById('login-screen').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // Navegación entre recursos
+        document.getElementById('btn-maquinaria').addEventListener('click', function() {
+            loadResourceType('maquinaria');
+        });
+
+        document.getElementById('btn-personal').addEventListener('click', function() {
+            loadResourceType('personal');
+        });
+
+        document.getElementById('btn-productos').addEventListener('click', function() {
+            loadResourceType('productos');
+        });
+
+        document.getElementById('btn-informes').addEventListener('click', function() {
+            document.getElementById('resource-content').style.display = 'none';
+            document.getElementById('resource-detail').style.display = 'none';
+            document.getElementById('reports-section').style.display = 'block';
+        });
+
+        document.getElementById('btn-back').addEventListener('click', function() {
+            document.getElementById('resource-detail').style.display = 'none';
+            document.getElementById('resource-content').style.display = 'block';
+        });
+
+        function loadResourceType(type) {
+            document.getElementById('resource-title').textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('resource-content').style.display = 'block';
+            document.getElementById('resource-detail').style.display = 'none';
+            document.getElementById('reports-section').style.display = 'none';
+            
+            // Aquí iría la llamada al backend para obtener los recursos
+            // Por ahora simulamos datos
+            const mockData = {
+                maquinaria: [
+                    {id: 1, nombre: 'Excavadora 3000', tipo: 'Pesada', modificacion: '2023-05-15'},
+                    {id: 2, nombre: 'Grúa Torre', tipo: 'Construcción', modificacion: '2023-06-20'}
+                ],
+                personal: [
+                    {id: 1, nombre: 'Juan Pérez', tipo: 'Operario', modificacion: '2023-07-10'},
+                    {id: 2, nombre: 'María Gómez', tipo: 'Supervisora', modificacion: '2023-07-12'}
+                ],
+                productos: [
+                    {id: 1, nombre: 'Tornillo 5mm', tipo: 'Ferretería', modificacion: '2023-08-01'},
+                    {id: 2, nombre: 'Tuerca 5mm', tipo: 'Ferretería', modificacion: '2023-08-01'}
+                ]
+            };
+            
+            const itemsContainer = document.getElementById('resource-items');
+            itemsContainer.innerHTML = '';
+            
+            mockData[type].forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.id}</td>
+                    <td>${item.nombre}</td>
+                    <td>${item.tipo}</td>
+                    <td>${item.modificacion}</td>
+                    <td><button class="btn-view" data-id="${item.id}" data-type="${type}">Ver</button></td>
+                `;
+                itemsContainer.appendChild(row);
+            });
+            
+            // Agregar eventos a los botones de ver
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewResourceDetails(this.getAttribute('data-type'), this.getAttribute('data-id'));
+                });
+            });
+        }
+        
+        function viewResourceDetails(type, id) {
+            document.getElementById('resource-content').style.display = 'none';
+            document.getElementById('resource-detail').style.display = 'block';
+            
+            // Aquí iría la llamada al backend para obtener los detalles
+            // Simulamos datos
+            const mockDetails = {
+                basic: {
+                    id: id,
+                    nombre: `Recurso ${id}`,
+                    tipo: type,
+                    estado: 'Activo',
+                    fechaCreacion: '2023-01-01',
+                    ultimaModificacion: '2023-10-01'
+                },
+                components: [
+                    `Componente 1 de ${type}`,
+                    `Componente 2 de ${type}`,
+                    `Componente 3 de ${type}`
+                ],
+                history: [
+                    {fecha: '2023-10-01', usuario: 'admin', cambio: 'Actualización de estado'},
+                    {fecha: '2023-09-15', usuario: 'user1', cambio: 'Modificación de componentes'},
+                    {fecha: '2023-01-01', usuario: 'admin', cambio: 'Creación del recurso'}
+                ]
+            };
+            
+            // Mostrar información básica
+            const basicInfo = document.getElementById('basic-info');
+            basicInfo.innerHTML = `
+                <p><strong>ID:</strong> ${mockDetails.basic.id}</p>
+                <p><strong>Nombre:</strong> ${mockDetails.basic.nombre}</p>
+                <p><strong>Tipo:</strong> ${mockDetails.basic.tipo}</p>
+                <p><strong>Estado:</strong> ${mockDetails.basic.estado}</p>
+                <p><strong>Fecha de creación:</strong> ${mockDetails.basic.fechaCreacion}</p>
+                <p><strong>Última modificación:</strong> ${mockDetails.basic.ultimaModificacion}</p>
+            `;
+            
+            // Mostrar componentes
+            const componentsList = document.getElementById('components-list');
+            componentsList.innerHTML = '';
+            mockDetails.components.forEach(comp => {
+                const li = document.createElement('li');
+                li.textContent = comp;
+                componentsList.appendChild(li);
+            });
+            
+            // Mostrar historial
+            const historyItems = document.getElementById('history-items');
+            historyItems.innerHTML = '';
+            mockDetails.history.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.fecha}</td>
+                    <td>${item.usuario}</td>
+                    <td>${item.cambio}</td>
+                `;
+                historyItems.appendChild(row);
+            });
+            
+            document.getElementById('detail-title').textContent = `Detalle de ${type}: ${mockDetails.basic.nombre}`;
+        }
+    </script>
+</body>
+</html>
